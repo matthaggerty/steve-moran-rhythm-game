@@ -2,29 +2,23 @@
 const NOTE_WIDTH = 60;
 const NOTE_HEIGHT = 20;
 const NOTE_SPEED = 5;
-const LANE_COUNT = 5;
+const LANE_COUNT = 3;
 const KEY_MAPPING = {
     'KeyA': 0,
-    'KeyS': 1,
-    'KeyJ': 2,
-    'KeyK': 3,
-    'KeyL': 4
+    'KeyJ': 1,
+    'KeyL': 2
 };
 
 const LANE_COLORS = [
     '#22cc44', // Green
     '#dd2222', // Red
     '#ddbb00', // Yellow
-    '#2244dd', // Blue
-    '#dd6600'  // Orange
 ];
 
 const LANE_COLORS_GLOW = [
     '#44ff66',
     '#ff4444',
     '#ffee00',
-    '#4466ff',
-    '#ff8800'
 ];
 
 const PARTICLE_COUNT = 15;
@@ -35,7 +29,7 @@ const SONG_BPM = 130;
 const BEAT_INTERVAL_MS = (60 / SONG_BPM) * 1000;
 
 // Per-lane hit flash timers (0 = no flash, 1 = full flash)
-let buttonFlash = [0, 0, 0, 0, 0];
+let buttonFlash = [0, 0, 0];
 
 // Game state
 let gameRunning = false;
@@ -71,9 +65,9 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
     CANVAS_WIDTH = canvas.width;
     CANVAS_HEIGHT = canvas.height;
-    FRETBOARD_TOP_WIDTH = CANVAS_WIDTH * 0.18;
-    FRETBOARD_BOTTOM_WIDTH = CANVAS_WIDTH * 0.96;
-    FRETBOARD_Y_OFFSET = CANVAS_HEIGHT * 0.38;
+    FRETBOARD_TOP_WIDTH = CANVAS_WIDTH * 0.12;
+    FRETBOARD_BOTTOM_WIDTH = CANVAS_WIDTH * 0.92;
+    FRETBOARD_Y_OFFSET = CANVAS_HEIGHT * 0.54;
 }
 
 resizeCanvas();
@@ -250,10 +244,13 @@ class TouchButton {
 }
 
 function buildTouchButtons() {
-    const bw = CANVAS_WIDTH / LANE_COUNT;
-    const bh = 80;
-    const by = CANVAS_HEIGHT - bh - 10;
-    return ['A','S','J','K','L'].map((key, i) => new TouchButton(i, key, i * bw, by, bw, bh));
+    const btnP = 0.95;
+    const bh = 100;
+    const by = CANVAS_HEIGHT - bh - 5;
+    return ['A','J','L'].map((key, i) => {
+        const pos = getLaneCenter(i, btnP);
+        return new TouchButton(i, key, pos.laneLeft, by, pos.laneWidth, bh);
+    });
 }
 
 // --- Drawing: Stage background ---
@@ -480,83 +477,6 @@ function drawFretboard() {
     const top = FRETBOARD_Y_OFFSET;
     const bot = CANVAS_HEIGHT;
 
-    ctx.beginPath();
-    ctx.moveTo(topLeft, top);
-    ctx.lineTo(topRight, top);
-    ctx.lineTo(botRight, bot);
-    ctx.lineTo(botLeft, bot);
-    ctx.closePath();
-    ctx.clip();
-
-    // Wood base gradient
-    const woodGrad = ctx.createLinearGradient(0, top, 0, bot);
-    woodGrad.addColorStop(0, 'rgba(30,10,0,0.55)');
-    woodGrad.addColorStop(0.3, 'rgba(50,20,5,0.7)');
-    woodGrad.addColorStop(0.7, 'rgba(60,28,8,0.78)');
-    woodGrad.addColorStop(1, 'rgba(40,15,2,0.85)');
-    ctx.fillStyle = woodGrad;
-    ctx.fillRect(0, top, CANVAS_WIDTH, bot - top);
-
-    // Wood grain lines
-    ctx.globalAlpha = 0.18;
-    for (let i = 0; i < 40; i++) {
-        const gy = top + ((i / 40) * (bot - top));
-        // interpolate x extents
-        const p = (gy - top) / (bot - top);
-        const gLeft = topLeft + (botLeft - topLeft) * p - 10;
-        const gRight = topRight + (botRight - topRight) * p + 10;
-        ctx.beginPath();
-        ctx.moveTo(gLeft, gy);
-        ctx.lineTo(gRight, gy + 1.5);
-        ctx.strokeStyle = i % 3 === 0 ? '#8B5a2b' : '#6b3a1a';
-        ctx.lineWidth = i % 5 === 0 ? 2 : 1;
-        ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
-    // Dark lane dividers (following perspective)
-    for (let i = 0; i <= LANE_COUNT; i++) {
-        const tFrac = i / LANE_COUNT;
-        const tx = topLeft + tFrac * FRETBOARD_TOP_WIDTH;
-        const bx = botLeft + tFrac * FRETBOARD_BOTTOM_WIDTH;
-        ctx.beginPath();
-        ctx.moveTo(tx, top);
-        ctx.lineTo(bx, bot);
-        ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        // Thin bright edge
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-    }
-
-    // Fret lines (horizontal, perspective-foreshortened)
-    const fretCount = 3;
-    for (let f = 1; f < fretCount; f++) {
-        const p = f / fretCount;
-        // Use squared progress for perspective bunching at top
-        const pp = p * p;
-        const gy = top + pp * (bot - top);
-        const gLeft = topLeft + (botLeft - topLeft) * pp;
-        const gRight = topRight + (botRight - topRight) * pp;
-        ctx.beginPath();
-        ctx.moveTo(gLeft, gy);
-        ctx.lineTo(gRight, gy);
-        ctx.strokeStyle = 'rgba(180,120,60,0.35)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-    }
-
-    // Center lane subtle highlight
-    const cx = CANVAS_WIDTH / 2;
-    const centerGlow = ctx.createLinearGradient(cx - 60, 0, cx + 60, 0);
-    centerGlow.addColorStop(0, 'rgba(255,255,255,0)');
-    centerGlow.addColorStop(0.5, 'rgba(255,255,255,0.04)');
-    centerGlow.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = centerGlow;
-    ctx.fillRect(0, top, CANVAS_WIDTH, bot - top);
-
     ctx.restore();
 
     // Hit zone glow strip
@@ -698,7 +618,7 @@ function startGame() {
     beatCount = 0; lastBeatTime = null;
     gameLoop.missedTotal = 0;
     activeKeys.clear();
-    buttonFlash = [0, 0, 0, 0, 0];
+    buttonFlash = [0, 0, 0];
     updateScore();
     playCrowdIntro();
     setTimeout(() => {
