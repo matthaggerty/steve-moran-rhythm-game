@@ -403,6 +403,194 @@ function drawComboEffect() {
     ctx.restore();
 }
 
+function drawBackground() {
+    const w = CANVAS_WIDTH;
+    const h = CANVAS_HEIGHT;
+
+    // Sky gradient — deep blue to teal
+    const sky = ctx.createLinearGradient(0, 0, 0, h * 0.75);
+    sky.addColorStop(0, '#05051a');
+    sky.addColorStop(0.5, '#0a1a3a');
+    sky.addColorStop(1, '#0d2b4a');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h);
+
+    // Stage trusses — left and right
+    drawTruss(w * 0.05, h * 0.05, h * 0.65);
+    drawTruss(w * 0.95, h * 0.05, h * 0.65);
+
+    // Neon starburst spotlights
+    drawStarburst(w * 0.15, h * 0.18, '#ff8800');
+    drawStarburst(w * 0.85, h * 0.18, '#ff8800');
+    drawStarburst(w * 0.5, h * 0.08, '#ffffff');
+
+    // Pixel grid runway
+    drawRunway(w, h);
+
+    // Crowd silhouettes
+    drawCrowd(w, h);
+}
+
+function drawTruss(x, y, height) {
+    const segH = 28;
+    const halfW = 18;
+    const segs = Math.floor(height / segH);
+    ctx.strokeStyle = '#2a4a7a';
+    ctx.lineWidth = 3;
+
+    // Two vertical rails
+    ctx.beginPath();
+    ctx.moveTo(x - halfW, y);
+    ctx.lineTo(x - halfW, y + height);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + halfW, y);
+    ctx.lineTo(x + halfW, y + height);
+    ctx.stroke();
+
+    // Cross braces
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#1e3860';
+    for (let i = 0; i < segs; i++) {
+        const sy = y + i * segH;
+        const ey = sy + segH;
+        if (i % 2 === 0) {
+            ctx.beginPath();
+            ctx.moveTo(x - halfW, sy);
+            ctx.lineTo(x + halfW, ey);
+            ctx.stroke();
+        } else {
+            ctx.beginPath();
+            ctx.moveTo(x + halfW, sy);
+            ctx.lineTo(x - halfW, ey);
+            ctx.stroke();
+        }
+    }
+
+    // Light bulbs at bottom of truss
+    const bulbColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44'];
+    for (let i = 0; i < 4; i++) {
+        ctx.fillStyle = bulbColors[i];
+        ctx.shadowColor = bulbColors[i];
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(x - halfW + i * (halfW * 2 / 3) + 3, y + height + 8, 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+}
+
+function drawStarburst(x, y, color) {
+    const rays = 12;
+    const innerR = 6;
+    const outerR = 55;
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    for (let i = 0; i < rays; i++) {
+        const angle = (i / rays) * Math.PI * 2;
+        const grad = ctx.createLinearGradient(x, y, x + Math.cos(angle) * outerR, y + Math.sin(angle) * outerR);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = i % 3 === 0 ? 3 : 1.5;
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(angle) * innerR, y + Math.sin(angle) * innerR);
+        ctx.lineTo(x + Math.cos(angle) * outerR, y + Math.sin(angle) * outerR);
+        ctx.stroke();
+    }
+    // Core glow
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, 20);
+    glow.addColorStop(0, color);
+    glow.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.globalAlpha = 0.8;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawRunway(w, h) {
+    const tileW = 48;
+    const tileH = 24;
+    const runwayLeft = w * 0.1;
+    const runwayRight = w * 0.9;
+    const runwayTop = h * 0.55;
+    const rows = Math.ceil((h - runwayTop) / tileH) + 1;
+    const cols = Math.ceil((runwayRight - runwayLeft) / tileW) + 1;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const tx = runwayLeft + col * tileW;
+            const ty = runwayTop + row * tileH;
+            // Alternating neon tile colors
+            const t = (row + col) % 3;
+            const baseColor = t === 0 ? '#ff0066' : t === 1 ? '#ff6600' : '#cc0044';
+            const alpha = 0.15 + (row / rows) * 0.25;
+            ctx.fillStyle = baseColor;
+            ctx.globalAlpha = alpha;
+            ctx.fillRect(tx + 1, ty + 1, tileW - 2, tileH - 2);
+            ctx.globalAlpha = 0.4 + (row / rows) * 0.3;
+            ctx.strokeStyle = baseColor;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(tx, ty, tileW, tileH);
+        }
+    }
+    ctx.globalAlpha = 1;
+}
+
+function drawCrowd(w, h) {
+    const crowdY = h * 0.62;
+    const crowdH = h * 0.12;
+
+    // Draw crowd silhouettes — rows of heads + raised arms
+    const personW = 22;
+    const count = Math.floor(w / personW);
+
+    for (let i = 0; i < count; i++) {
+        const px = i * personW + personW / 2;
+        // Slight height variation
+        const offset = Math.sin(i * 1.7) * 8;
+        const py = crowdY + offset;
+
+        ctx.fillStyle = '#0a0a1a';
+        ctx.globalAlpha = 0.9;
+
+        // Head
+        ctx.beginPath();
+        ctx.arc(px, py, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body
+        ctx.fillRect(px - 5, py + 7, 10, crowdH * 0.4);
+
+        // Raised arm (every other person)
+        if (i % 2 === 0) {
+            ctx.beginPath();
+            ctx.moveTo(px - 5, py + 10);
+            ctx.lineTo(px - 14, py - 10);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#0a0a1a';
+            ctx.stroke();
+        } else {
+            ctx.beginPath();
+            ctx.moveTo(px + 5, py + 10);
+            ctx.lineTo(px + 14, py - 10);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#0a0a1a';
+            ctx.stroke();
+        }
+    }
+    ctx.globalAlpha = 1;
+
+    // Neon edge glow over crowd
+    const crowdGlow = ctx.createLinearGradient(0, crowdY - 20, 0, crowdY + crowdH);
+    crowdGlow.addColorStop(0, 'rgba(255, 0, 100, 0.15)');
+    crowdGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = crowdGlow;
+    ctx.fillRect(0, crowdY - 20, w, crowdH + 20);
+}
+
 function drawFretboard() {
     ctx.save();
 
@@ -506,6 +694,7 @@ function gameLoop() {
     if (!gameRunning) return;
 
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    drawBackground();
     drawFretboard();
 
     const now = Date.now();
