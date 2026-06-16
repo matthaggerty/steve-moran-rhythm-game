@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Rhythm Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="scoreboard">
+            <p>Score: <span id="score">0</span></p>
+            <p>Combo: <span id="combo">0</span></p>
+        </div>
+
+        <button id="start-button">Start Shredding</button>
+
+        <div id="mobile-instructions">
+            <p>Tap the buttons to hit the notes!</p>
+        </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="background-music" src="the-return-of-the-rebel.mp3" loop></audio>
+    <audio id="crowd-intro" src="crowd_intro.mp3"></audio>
+    <audio id="good-note" src="sp_cheer1.wav"></audio>
+    <audio id="bad-note" src="bad_note2.wav"></audio>
+    <audio id="crowd-boo" src="SM_Crowd_Boo_10.wav"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

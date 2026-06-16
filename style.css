@@ -1,0 +1,134 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: white;
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    touch-action: none;
+    background: url('stage_background.jpeg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+#game-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+#start-button {
+    background-color: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2px;
+    touch-action: manipulation;
+    box-shadow: 0 0 20px rgba(255, 64, 129, 0.5);
+    z-index: 100;
+}
+
+#start-button:hover {
+    background-color: #ff80ab;
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 64, 129, 0.7);
+}
+
+#start-button:active {
+    transform: scale(0.95);
+}
+
+#start-button.hidden {
+    display: none;
+}
+
+#scoreboard {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+#scoreboard p {
+    margin: 0;
+    padding: 10px 25px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+canvas {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100vw;
+    max-height: 100vh;
+    touch-action: none;
+}
+
+#mobile-instructions {
+    position: fixed;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    #scoreboard {
+        font-size: 20px;
+    }
+    
+    #scoreboard p {
+        padding: 8px 20px;
+    }
+    
+    #start-button {
+        padding: 12px 30px;
+        font-size: 20px;
+    }
+    
+    canvas {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/* Prevent text selection on mobile */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
