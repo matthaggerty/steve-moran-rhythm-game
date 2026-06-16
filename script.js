@@ -26,8 +26,23 @@ const PARTICLE_COLORS = ['#ff4081', '#00ff00', '#ffff00', '#00ffff', '#ff00ff'];
 const COMBO_THRESHOLDS = [5, 10, 20, 50];
 
 const SONG_BPM = 130;
-const BTN_PROGRESS = 0.88; // Pull buttons up away from browser nav bar
+const BTN_PROGRESS = 0.88;
 const BEAT_INTERVAL_MS = (60 / SONG_BPM) * 1000;
+
+// Structured note patterns — each array is one measure (4 beats).
+// Values are lane index (0=green,1=yellow,2=red), array=chord, null=rest.
+const NOTE_PATTERNS = [
+    [0, null, 1, null],
+    [2, null, 1, null],
+    [0, 1, 2, 1],
+    [0, null, 2, null],
+    [1, 0, 1, 2],
+    [2, 1, 0, null],
+    [0, 2, null, 1],
+    [0, null, 0, 2],
+    [[0,2], null, 1, null],
+    [1, 2, 0, 2],
+];
 
 // Per-lane hit flash timers (0 = no flash, 1 = full flash)
 let buttonFlash = [0, 0, 0];
@@ -122,7 +137,9 @@ class Note {
         if (this.hit && this.hitFlash <= 0) return;
         const pos = getLaneCenter(this.lane, this.progress);
         // Radius grows as note approaches bottom (perspective scale)
-        const r = Math.max(10, pos.laneWidth * 0.32);
+        // Perspective: small dot at top, grows to fill lane at bottom
+        const perspectiveScale = Math.pow(this.progress, 1.8);
+        const r = Math.max(3, pos.laneWidth * 0.38 * perspectiveScale);
 
         ctx.save();
 
@@ -638,15 +655,17 @@ function maybeGenerateNotes(now) {
     if (!lastBeatTime) return;
     if (now - lastBeatTime >= BEAT_INTERVAL_MS) {
         lastBeatTime += BEAT_INTERVAL_MS;
-        beatCount++;
-        const count = (beatCount % 4 === 0) ? 2 : 1;
-        const usedLanes = new Set();
-        for (let i = 0; i < count; i++) {
-            let lane;
-            do { lane = Math.floor(Math.random() * LANE_COUNT); } while (usedLanes.has(lane));
-            usedLanes.add(lane);
-            notes.push(new Note(lane));
+
+        const patternIndex = Math.floor(beatCount / 4) % NOTE_PATTERNS.length;
+        const beatIndex = beatCount % 4;
+        const beat = NOTE_PATTERNS[patternIndex][beatIndex];
+
+        if (beat !== null && beat !== undefined) {
+            const lanes = Array.isArray(beat) ? beat : [beat];
+            lanes.forEach(lane => notes.push(new Note(lane)));
         }
+
+        beatCount++;
     }
 }
 
