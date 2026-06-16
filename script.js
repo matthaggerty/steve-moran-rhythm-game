@@ -26,6 +26,7 @@ const PARTICLE_COLORS = ['#ff4081', '#00ff00', '#ffff00', '#00ffff', '#ff00ff'];
 const COMBO_THRESHOLDS = [5, 10, 20, 50];
 
 const SONG_BPM = 130;
+const BTN_PROGRESS = 0.88; // Pull buttons up away from browser nav bar
 const BEAT_INTERVAL_MS = (60 / SONG_BPM) * 1000;
 
 // Per-lane hit flash timers (0 = no flash, 1 = full flash)
@@ -158,7 +159,7 @@ class Note {
     }
 
     isInHitZone() {
-        return this.progress >= 0.88 && this.progress <= 0.98;
+        return this.progress >= BTN_PROGRESS - 0.05 && this.progress <= BTN_PROGRESS + 0.05;
     }
 }
 
@@ -244,7 +245,7 @@ class TouchButton {
 }
 
 function buildTouchButtons() {
-    const btnP = 0.95;
+    const btnP = BTN_PROGRESS;
     const bh = 100;
     const by = CANVAS_HEIGHT - bh - 5;
     return ['A','J','L'].map((key, i) => {
@@ -493,9 +494,8 @@ function drawFretboard() {
     ctx.restore();
 
     // Hit ring buttons
-    const btnP = 0.95;
     for (let i = 0; i < LANE_COUNT; i++) {
-        const pos = getLaneCenter(i, btnP);
+        const pos = getLaneCenter(i, BTN_PROGRESS);
         const isActive = activeKeys.has(i);
         const flash = buttonFlash[i];
         drawHitButton(pos.x, pos.y, pos.laneWidth * 0.38, LANE_COLORS[i], LANE_COLORS_GLOW[i], isActive, flash);
@@ -668,7 +668,7 @@ function handleNoteHit(lane) {
         updateScore();
         playGoodNote();
         buttonFlash[lane] = 1.0;
-        const btnPos = getLaneCenter(lane, 0.95);
+        const btnPos = getLaneCenter(lane, BTN_PROGRESS);
         createParticles(btnPos.x, btnPos.y);
         if (COMBO_THRESHOLDS.includes(combo)) createComboEffect();
     } else {
