@@ -1,19 +1,13 @@
 body {
     margin: 0;
     padding: 0;
-    padding-bottom: env(safe-area-inset-bottom);
     font-family: Arial, sans-serif;
-    background-color: #1a1a1a;
+    background-color: #000;
     color: white;
-    min-height: 100vh;
     width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100dvh;
     overflow: hidden;
     touch-action: none;
-    background: url('stage_background.jpeg') no-repeat center top;
-    background-size: cover;
 }
 
 #game-container {
@@ -27,6 +21,10 @@ body {
     justify-content: center;
     align-items: center;
     background-color: transparent;
+    background-image: url('stage_background.jpeg');
+    background-size: 100% 100%;
+    background-position: center top;
+    background-repeat: no-repeat;
 }
 
 #start-button {
@@ -62,24 +60,24 @@ body {
 
 #scoreboard {
     position: fixed;
-    top: 20px;
+    top: 55%;
     left: 0;
     right: 0;
     display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-size: 24px;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 20px;
     font-weight: bold;
     z-index: 10;
+    pointer-events: none;
 }
 
 #scoreboard p {
     margin: 0;
-    padding: 10px 25px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 15px;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(5px);
+    padding: 6px 14px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
 canvas {
