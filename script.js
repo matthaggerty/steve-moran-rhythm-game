@@ -727,7 +727,6 @@ function gameLoop() {
 
     drawComboEffect();
 
-    if (isMobile) touchButtons.forEach(b => b.draw());
 
     requestAnimationFrame(gameLoop);
 }
