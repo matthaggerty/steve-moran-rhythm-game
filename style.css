@@ -125,6 +125,59 @@ canvas {
     }
 }
 
+#game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 200;
+    gap: 20px;
+}
+
+#game-over-overlay.hidden {
+    display: none;
+}
+
+#game-over-overlay h1 {
+    font-size: 64px;
+    color: #ff4081;
+    text-shadow: 0 0 30px rgba(255, 64, 129, 0.8);
+    margin: 0;
+    letter-spacing: 4px;
+}
+
+#game-over-overlay p {
+    font-size: 32px;
+    margin: 0;
+}
+
+#play-again-button {
+    background-color: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 40px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(255, 64, 129, 0.5);
+}
+
+#play-again-button:hover {
+    background-color: #ff80ab;
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 64, 129, 0.7);
+}
+
 /* Prevent text selection on mobile */
 * {
     -webkit-tap-highlight-color: transparent;
