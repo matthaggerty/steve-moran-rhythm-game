@@ -26,7 +26,7 @@ const PARTICLE_COLORS = ['#ff4081', '#00ff00', '#ffff00', '#00ffff', '#ff00ff'];
 const COMBO_THRESHOLDS = [5, 10, 20, 50];
 
 const SONG_BPM = 130;
-const BTN_PROGRESS = 0.88;
+const BTN_PROGRESS = 0.82;
 const BEAT_INTERVAL_MS = (60 / SONG_BPM) * 1000;
 
 // Structured note patterns — each array is one measure (4 beats).
