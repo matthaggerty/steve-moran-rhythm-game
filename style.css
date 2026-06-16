@@ -11,7 +11,8 @@ body {
     align-items: center;
     overflow: hidden;
     touch-action: none;
-    background: #0a0a1a;
+    background: url('stage_background.jpeg') no-repeat center top;
+    background-size: cover;
 }
 
 #game-container {
